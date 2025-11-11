@@ -1,17 +1,17 @@
-# 🩺 SonoScribe-Pro: A Hybrid Transformer Framework for Trustworthy Breast Cancer Diagnosis  
+# SonoScribe-Pro: A Hybrid Transformer Framework for Trustworthy Breast Cancer Diagnosis  
 
 SonoScribe-Pro is an advanced deep learning framework that assists radiologists in detecting and interpreting breast tumors from ultrasound images.  
 Unlike traditional black-box AI models, it combines **explainable segmentation**, **tumor classification**, and **uncertainty quantification**, offering not only accurate predictions but also insights into *why* and *how confident* the system is about each diagnosis.  
 
 ---
 
-## 📘 Abstract  
+## Abstract  
 Medical AI systems often act as opaque black boxes, providing predictions without clarity or confidence estimation. SonoScribe-Pro introduces a **hybrid Swin Transformer–U-Net model** capable of segmenting lesion boundaries, classifying tumor types (benign, malignant, or normal), and quantifying prediction uncertainty.  
 This creates a clinically reliable AI tool that mimics expert radiologists’ reasoning—focusing on the lesion area, making data-driven classifications, and flagging uncertain cases for expert review.  
 
 ---
 
-## 🎯 Problem Statement  
+## Problem Statement  
 Conventional CNN-based classifiers can predict tumor types but fail to explain *why* a decision was made or *how confident* it is. In critical medical contexts, lack of interpretability and uncertainty estimation reduces clinical trust.  
 
 SonoScribe-Pro bridges this gap by integrating three key capabilities:
@@ -21,7 +21,7 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ---
 
-## 🧠 Core Features  
+## Core Features  
 - **Swin-UNet Backbone** — Combines Swin Transformer encoder and CNN decoder for effective feature extraction and localization.  
 - **Dual-Head Network** — Simultaneous segmentation and classification from the same feature space.  
 - **Monte Carlo Dropout** — Estimates model uncertainty during inference.  
@@ -30,7 +30,7 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ---
 
-## ⚙️ Methodology & Workflow  
+## Methodology & Workflow  
 **Stage 1:** Baseline Classifier  
 - Train a standard CNN (e.g., ResNet-34) for benign vs malignant classification.  
 - Generate Grad-CAM maps for interpretability comparison.  
@@ -48,7 +48,7 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ---
 
-## 🧩 Model Architecture  
+## Model Architecture  
 - **Encoder:** Swin Transformer for hierarchical self-attention and global feature capture.  
 - **Decoder:** CNN layers for fine-grained reconstruction of segmentation masks.  
 - **Outputs:**  
@@ -58,14 +58,14 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ---
 
-## 🧪 Dataset  
+## Dataset  
 - **Source:** [Breast Ultrasound Images Dataset (Kaggle)](https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset)  
 - **Classes:** Normal, Benign, Malignant  
 - **Images:** 780 ultrasound scans with annotated lesion masks  
 
 ---
 
-## 🧰 Technical Stack  
+## Technical Stack  
 - **Language:** Python  
 - **Framework:** PyTorch  
 - **Libraries:**  
@@ -76,7 +76,7 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ---
 
-## 🧾 Installation  
+## Installation  
 
 ```bash
 # Clone the repository
