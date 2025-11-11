@@ -1,0 +1,11 @@
+torch>=2.0
+torchvision
+timm
+albumentations
+opencv-python
+scikit-learn
+matplotlib
+pandas
+numpy
+tensorboard
+Pillow
