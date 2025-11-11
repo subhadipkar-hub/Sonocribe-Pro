@@ -1,0 +1,81 @@
+# ✅ Step 1: Import Libraries
+import os
+import cv2
+import torch
+import numpy as np
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+from PIL import Image
+
+# ✅ Step 2: Define the dataset root (your extracted dataset)
+data_root = "/content/data/Dataset_BUSI_with_GT"
+
+# These folders exist in your dataset
+train_dir = os.path.join(data_root)
+val_dir   = os.path.join(data_root)
+test_dir  = os.path.join(data_root)
+mask_dir  = None   # No segmentation masks in BUSI dataset
+
+# ✅ Step 3: Define image transformations
+train_tfms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize([0.5, 0.5, 0.5],
+                         [0.5, 0.5, 0.5])
+])
+
+val_tfms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.5, 0.5, 0.5],
+                         [0.5, 0.5, 0.5])
+])
+
+# ✅ Step 4: Create a custom dataset class
+class BreastUSDataset(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+
+        # Get class folders: ['benign', 'malignant', 'normal']
+        self.classes = sorted(os.listdir(root_dir))
+        self.image_paths = []
+        self.labels = []
+
+        for idx, cls in enumerate(self.classes):
+            class_folder = os.path.join(root_dir, cls)
+            for img_name in os.listdir(class_folder):
+                if img_name.endswith(('.png', '.jpg', '.jpeg')):
+                    self.image_paths.append(os.path.join(class_folder, img_name))
+                    self.labels.append(idx)
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.image_paths[idx]
+        label = self.labels[idx]
+        image = Image.open(img_path).convert('RGB')
+
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
+
+# ✅ Step 5: Create Dataset objects
+train_ds = BreastUSDataset(train_dir, transform=train_tfms)
+val_ds   = BreastUSDataset(val_dir, transform=val_tfms)
+
+# ✅ Step 6: Create DataLoaders
+train_loader = DataLoader(train_ds, batch_size=8, shuffle=True)
+val_loader   = DataLoader(val_ds, batch_size=8, shuffle=False)
+
+# ✅ Step 7: Sanity Check
+print(f"Total training images: {len(train_ds)}")
+print(f"Total validation images: {len(val_ds)}")
+
+# Check one sample batch
+x, y = next(iter(train_loader))
+print("Batch shape:", x.shape)
+print("Labels:", y)
