@@ -1,0 +1,133 @@
+# Corrected paths
+data_dir = "/content/data"
+
+# -------------------------------------------------
+# 1 IMPORTS
+# -------------------------------------------------
+import torch, os
+from torch import nn, optim
+from torchvision import datasets, transforms, models
+from torch.utils.data import DataLoader, random_split
+from sklearn.metrics import f1_score, roc_auc_score
+from tqdm import tqdm
+
+# -------------------------------------------------
+# 2 DEVICE
+# -------------------------------------------------
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Device: {device}")
+
+# -------------------------------------------------
+# 3️ TRANSFORMS
+# -------------------------------------------------
+train_tfms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(15),
+    transforms.ToTensor()
+])
+val_tfms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor()
+])
+
+# -------------------------------------------------
+# 4️ LOAD DATA FROM SINGLE FOLDER
+# -------------------------------------------------
+full_dataset = datasets.ImageFolder(data_dir, transform=train_tfms)
+
+train_size = int(0.8 * len(full_dataset))
+val_size = len(full_dataset) - train_size
+train_ds, val_ds = random_split(full_dataset, [train_size, val_size])
+
+train_ds.dataset.transform = train_tfms
+val_ds.dataset.transform = val_tfms
+
+train_loader = DataLoader(train_ds, batch_size=8, shuffle=True)
+val_loader = DataLoader(val_ds, batch_size=8, shuffle=False)
+
+print(f"Train samples: {len(train_ds)}")
+print(f"Val samples: {len(val_ds)}")
+
+# -------------------------------------------------
+# 5️ MODEL (EfficientNetB0)
+# -------------------------------------------------
+model = models.efficientnet_b0(pretrained=True)
+for param in model.features.parameters():
+    param.requires_grad = False
+
+# Fix classifier for 3 classes
+in_features = model.classifier[1].in_features
+model.classifier = nn.Sequential(
+    nn.Linear(in_features, 512),
+    nn.ReLU(),
+    nn.Dropout(0.3),
+    nn.Linear(512, 3)
+)
+model = model.to(device)
+
+# -------------------------------------------------
+# 6️ LOSS, OPTIMIZER, SCHEDULER
+# -------------------------------------------------
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+
+# -------------------------------------------------
+# 7️ TRAINING + VALIDATION FUNCTIONS
+# -------------------------------------------------
+def train_one_epoch(model, loader, optimizer, criterion):
+    model.train()
+    total_loss, total_correct, total_preds, total_labels = 0, 0, [], []
+    for x, y in tqdm(loader):
+        x, y = x.to(device), y.to(device)
+        optimizer.zero_grad()
+        out = model(x)
+        loss = criterion(out, y)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+        preds = out.argmax(dim=1)
+        total_correct += (preds == y).sum().item()
+        total_preds.extend(preds.cpu().numpy())
+        total_labels.extend(y.cpu().numpy())
+    acc = total_correct / len(loader.dataset)
+    f1 = f1_score(total_labels, total_preds, average="macro")
+    return total_loss / len(loader), acc, f1
+
+def validate(model, loader, criterion):
+    model.eval()
+    total_loss, total_correct, total_preds, total_labels = 0, 0, [], []
+    with torch.no_grad():
+        for x, y in tqdm(loader):
+            x, y = x.to(device), y.to(device)
+            out = model(x)
+            loss = criterion(out, y)
+            total_loss += loss.item()
+            preds = out.argmax(dim=1)
+            total_correct += (preds == y).sum().item()
+            total_preds.extend(preds.cpu().numpy())
+            total_labels.extend(y.cpu().numpy())
+    acc = total_correct / len(loader.dataset)
+    f1 = f1_score(total_labels, total_preds, average="macro")
+    try:
+        auc = roc_auc_score(
+            torch.nn.functional.one_hot(torch.tensor(total_labels), num_classes=3),
+            torch.nn.functional.one_hot(torch.tensor(total_preds), num_classes=3),
+            multi_class="ovr"
+        )
+    except:
+        auc = 0
+    return total_loss / len(loader), acc, f1, auc
+
+# -------------------------------------------------
+# 8️ TRAINING LOOP
+# -------------------------------------------------
+EPOCHS = 5
+for epoch in range(1, EPOCHS + 1):
+    print(f"\n=== Epoch {epoch}/{EPOCHS} ===")
+    train_loss, train_acc, train_f1 = train_one_epoch(model, train_loader, optimizer, criterion)
+    val_loss, val_acc, val_f1, val_auc = validate(model, val_loader, criterion)
+    scheduler.step()
+    print(f"Train Loss: {train_loss:.4f} | Acc: {train_acc:.4f} | F1: {train_f1:.4f}")
+    print(f"Val Loss:   {val_loss:.4f} | Acc: {val_acc:.4f} | F1: {val_f1:.4f} | AUC: {val_auc:.4f}")
