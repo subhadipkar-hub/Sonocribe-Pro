@@ -1,0 +1,27 @@
+# Breast Ultrasound Images Dataset (for SonoScribe-Pro)
+
+##  Overview
+This project uses the **Breast Ultrasound Images Dataset** available on Kaggle:
+👉 https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset
+
+It contains ultrasound scans categorized into **Normal**, **Benign**, and **Malignant** classes, along with corresponding segmentation masks outlining the tumor regions.
+  [Note - link is provided download it (will be in  zip file). 
+   
+   Unzip the file either in computer system then upload in  google drive (make sure gmail account where being uploaded is same as the account used in google colab) 
+   Code -
+   from google.colab import drive
+   drive.mount('/content/drive')
+   !unzip -q "/content/drive/MyDrive/breast-ultrasound-images-dataset.zip" -d /content/data
+
+   Or unzip the file directly in google colab
+   Code -
+   !unzip -q "/content/breast-ultrasound-images-dataset.zip" -d /content/data
+
+   To check if unzipped
+   Code-
+   import os
+   print(os.listdir("/content/data/Dataset_BUSI_with_GT"))
+
+   Expected Outcome -
+   ['malignant', 'normal', 'benign']           
+   ]
