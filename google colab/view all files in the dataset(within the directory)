@@ -1,0 +1,19 @@
+import os
+
+root_dir = "/content/data/Dataset_BUSI_with_GT/benign"  # You can change to malignant or normal
+
+for f in sorted(os.listdir(root_dir))[:10]:  # show first 10 files
+    print(f)
+
+
+
+Otherwise
+
+
+
+import os
+
+root_dir = "/content/data/Dataset_BUSI_with_GT/benign"  # You can change to malignant or normal
+
+for f in sorted(os.listdir(root_dir)):  # show all files in that directory 
+    print(f)
