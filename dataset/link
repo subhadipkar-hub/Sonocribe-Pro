@@ -1,7 +1,0 @@
-# Breast Ultrasound Images Dataset (for SonoScribe-Pro)
-
-##  Overview
-This project uses the **Breast Ultrasound Images Dataset** available on Kaggle:
-👉 https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset
-
-It contains ultrasound scans categorized into **Normal**, **Benign**, and **Malignant** classes, along with corresponding segmentation masks outlining the tumor regions.
