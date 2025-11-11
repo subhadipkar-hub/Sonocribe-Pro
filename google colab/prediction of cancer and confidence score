@@ -1,0 +1,28 @@
+import torch
+from torchvision import transforms
+from PIL import Image
+
+# Define the class names in the same order as your dataset
+class_names = ['benign', 'malignant', 'normal']
+
+# Transformation – must match the one used during validation
+test_tfms = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),            
+])
+
+# Load a sample image (change the path to your test image)
+img_path = "/content/data/Dataset_BUSI_with_GT/benign/benign (119).png"  # change the input image to check prediction and its score
+img = Image.open(img_path).convert("RGB")
+x = test_tfms(img).unsqueeze(0).to(device)
+
+# Make prediction
+model.eval()
+with torch.no_grad():
+    outputs = model(x)
+    probs = torch.softmax(outputs, dim=1)
+    conf, pred = torch.max(probs, dim=1)
+
+# Show result
+print(f"Predicted Class: {class_names[pred.item()]}")
+print(f"Confidence: {conf.item()*100:.2f}%")
