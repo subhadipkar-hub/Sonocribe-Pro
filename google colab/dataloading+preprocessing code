@@ -1,4 +1,4 @@
-# ✅ Step 1: Import Libraries
+# Step 1: Import Libraries
 import os
 import cv2
 import torch
@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
 
-# ✅ Step 2: Define the dataset root (your extracted dataset)
+# Step 2: Define the dataset root (your extracted dataset)
 data_root = "/content/data/Dataset_BUSI_with_GT"
 
 # These folders exist in your dataset
@@ -16,7 +16,7 @@ val_dir   = os.path.join(data_root)
 test_dir  = os.path.join(data_root)
 mask_dir  = None   # No segmentation masks in BUSI dataset
 
-# ✅ Step 3: Define image transformations
+# Step 3: Define image transformations
 train_tfms = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(),
@@ -32,7 +32,7 @@ val_tfms = transforms.Compose([
                          [0.5, 0.5, 0.5])
 ])
 
-# ✅ Step 4: Create a custom dataset class
+# Step 4: Create a custom dataset class
 class BreastUSDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
@@ -63,15 +63,15 @@ class BreastUSDataset(Dataset):
 
         return image, label
 
-# ✅ Step 5: Create Dataset objects
+# Step 5: Create Dataset objects
 train_ds = BreastUSDataset(train_dir, transform=train_tfms)
 val_ds   = BreastUSDataset(val_dir, transform=val_tfms)
 
-# ✅ Step 6: Create DataLoaders
+# Step 6: Create DataLoaders
 train_loader = DataLoader(train_ds, batch_size=8, shuffle=True)
 val_loader   = DataLoader(val_ds, batch_size=8, shuffle=False)
 
-# ✅ Step 7: Sanity Check
+# Step 7: Sanity Check
 print(f"Total training images: {len(train_ds)}")
 print(f"Total validation images: {len(val_ds)}")
 
