@@ -80,7 +80,7 @@ SonoScribe-Pro bridges this gap by integrating three key capabilities:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/SonoScribe-Pro.git
+git clone https://github.com/karsu/SonoScribe-Pro.git
 cd SonoScribe-Pro
 
 # Install dependencies
